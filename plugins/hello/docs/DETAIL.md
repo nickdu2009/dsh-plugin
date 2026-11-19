@@ -18,7 +18,7 @@ Adds a `hello_greet` tool that greets someone by name.
 
 ```yaml
 - id: hello
-  name: dsh-plugin-hello
+  name: '@nick.du/dsh-plugin-hello'
   config:
     greeting: 你好
 ```
@@ -27,8 +27,10 @@ Adds a `hello_greet` tool that greets someone by name.
 
 ## 安装
 
-1. 构建：`pnpm --filter dsh-plugin-hello build`
-2. 在 DeepSeek Harness 中打开「插件」页面，选择「添加插件」，选中本插件目录。
+1. 构建：`pnpm --filter @nick.du/dsh-plugin-hello build`
+2. 在 DeepSeek Harness 中打开「插件」页面，选择「添加插件」：
+   - 已发布到 npm 时，直接输入 `@nick.du/dsh-plugin-hello`；
+   - 本地开发时，选中本插件目录。
 3. 在**新会话**中让模型调用 `hello_greet` 验证。
 
 ## 限制

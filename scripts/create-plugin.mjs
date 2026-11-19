@@ -3,7 +3,7 @@
  * Create a plugin directory from `templates/plugin`.
  *
  * Usage:
- *   pnpm run new <name> [--title "Title"] [--description "Sentence-case description."]
+ *   pnpm run new <name> [--title "Title"] [--description "Sentence-case description."] [--scope @scope]
  */
 
 import { existsSync } from 'node:fs'
@@ -14,24 +14,26 @@ import { fileURLToPath } from 'node:url'
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const templateDir = path.join(repoRoot, 'templates', 'plugin')
 const pluginsDir = path.join(repoRoot, 'plugins')
+const rootManifest = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'))
 
 const TEXT_EXTENSIONS = new Set(['.json', '.md', '.ts', '.yml', '.yaml', '.svg', '.txt'])
+const VALUE_FLAGS = new Set(['title', 'description', 'scope'])
 
 function fail(message) {
   console.error(`create-plugin: ${message}`)
   console.error('')
   console.error(
-    'Usage: pnpm run new <name> [--title "Title"] [--description "Sentence-case description."]',
+    'Usage: pnpm run new <name> [--title "Title"] [--description "Sentence-case description."] [--scope @scope]',
   )
   process.exit(1)
 }
 
 function parseArgs(argv) {
-  const options = { name: '', title: '', description: '' }
+  const options = { name: '', title: '', description: '', scope: '' }
 
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]
-    if (argument === '--title' || argument === '--description') {
+    if (argument.startsWith('--') && VALUE_FLAGS.has(argument.slice(2))) {
       const value = argv[index + 1]
       if (!value || value.startsWith('--')) fail(`${argument} needs a value`)
       options[argument.slice(2)] = value
@@ -82,8 +84,19 @@ const title = options.title || toTitle(name)
 const description = options.description || 'Adds one Agent tool to DeepSeek Harness.'
 const tool = `${name.replaceAll('-', '_')}_greet`
 
+const scopeInput = options.scope || rootManifest.dshPluginScope
+if (!scopeInput) {
+  fail('no npm scope: set "dshPluginScope" in the root package.json or pass --scope @scope')
+}
+const scope = scopeInput.startsWith('@') ? scopeInput : `@${scopeInput}`
+if (!/^@[a-z0-9][a-z0-9._~-]*$/.test(scope)) {
+  fail(`"${scope}" is not a valid npm scope (for example: @nick.du)`)
+}
+const packageName = `${scope}/dsh-plugin-${name}`
+
 const replacements = {
   __NAME__: name,
+  __PACKAGE__: packageName,
   __TITLE__: title,
   __DESCRIPTION__: description,
   __TOOL__: tool,
@@ -105,7 +118,7 @@ for (const file of await collectFiles(target)) {
 }
 
 console.log(`Created plugins/${name}`)
-console.log(`  package: dsh-plugin-${name}`)
+console.log(`  package: ${packageName}`)
 console.log(`  title:   ${title}`)
 console.log(`  tool:    ${tool}`)
 console.log('')
@@ -114,4 +127,4 @@ console.log('  1. pnpm install')
 console.log(`  2. Implement the real capability in plugins/${name}/src/index.ts`)
 console.log('  3. Replace icon.svg and write the Chinese locale and docs/DETAIL.md')
 console.log('  4. pnpm check')
-console.log('  5. Install it from DeepSeek Harness -> Plugins -> Add plugin')
+console.log(`  5. Install from DeepSeek Harness -> Plugins -> Add plugin: ${packageName}`)

@@ -6,6 +6,7 @@ Working agreements for agents that develop plugins in this repository.
 
 - This is a collection of DeepSeek Harness (DSH) plugin bundles: **one plugin per directory under `plugins/`**.
 - Every new plugin is written in TypeScript. Migrated plugins may stay JavaScript; do not rewrite them only to satisfy the TypeScript rule.
+- Plugins are published to npm as `@nick.du/dsh-plugin-<name>`. The scope comes from `dshPluginScope` in the root `package.json`; the generator and `cordis.patch.yml` rows use it.
 - The repository is public on GitHub. Never commit secrets, DSH profile files, `node_modules/`, or build output (`lib/`).
 - The running DSH installation is the authority for APIs and versions. Load the `dsh-doc` skill before designing, building, or debugging a plugin.
 
@@ -23,16 +24,23 @@ Working agreements for agents that develop plugins in this repository.
 1. `pnpm run new <name> --title "<Title>" --description "<Sentence-case description.>"`
 2. Implement the capability under `plugins/<name>/src/`. Keep the exported shape: `name`, optional `inject`, optional `Config`, `apply(ctx, config)`.
 3. Register resources with `ctx.effect` / `ctx.on` and return their disposers. Use `import type` for `@deepseek-ai/cordis`.
-4. Keep these in sync: `package.json` (`exports`, `files`, `dsh.bundle.patch`), `cordis.patch.yml`, `locale/en.json`, `locale/zh.json`, `docs/DETAIL.md`, `icon.svg`, `README.md`.
+4. Keep these in sync: `package.json` (`name`, `engines.dsh`, `exports`, `files`, `dsh.bundle.patch`), `cordis.patch.yml`, `locale/en.json`, `locale/zh.json`, `docs/DETAIL.md`, `icon.svg`, `README.md`.
 5. Add unit tests for pure logic under `src/*.test.ts`. Integration behavior is verified in DSH, not mocked.
 6. `pnpm check` must pass before committing.
 
 ## Install and verify
 
-- Install only when the user asks; installing changes the shared profile. Use the DSH **Plugins** page / `plugin_manager` and select the plugin directory. Do not edit `$DSH_PROFILE_DIR` files by hand.
-- Build before installing; DSH links the directory, so a rebuild is required after source changes.
+- Install only when the user asks; installing changes the shared profile. Use the DSH **Plugins** page / `plugin_manager` and select the plugin directory or enter the npm package name. Do not edit `$DSH_PROFILE_DIR` files by hand.
+- Build before installing from a directory; DSH links the directory, so a rebuild is required after source changes.
 - After installation, verify the requested capability in a **new session** (or the live page for UI). Confirm the plugin row, locale text, detail page, and icon. Report what remains unverified; installation alone is not visual or behavioral verification.
 - Restore any user state changed during testing.
+
+## Publish
+
+- Releases use Trusted Publishing from `.github/workflows/publish.yml`; never add an `NPM_TOKEN` secret or commit npm credentials.
+- Bump `version` in the plugin's `package.json`, commit it, then push a tag named `<plugin>-v<version>` (for example `hello-v0.1.1`). The workflow verifies the tag against the manifest, builds, and publishes with provenance.
+- The first version of a new package must be published manually (npm requires the package to exist before a trusted publisher can be attached), then bind the GitHub repository and `publish.yml` under the package's npm settings.
+- Do not publish a package whose `engines.dsh` does not cover the DSH version it was verified against.
 
 ## Dependency policy
 

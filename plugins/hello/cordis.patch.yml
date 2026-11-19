@@ -3,6 +3,6 @@
 # the plugin re-applies without a restart.
 - insert:
     - id: hello
-      name: dsh-plugin-hello
+      name: '@nick.du/dsh-plugin-hello'
       config:
         greeting: Hello

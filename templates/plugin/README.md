@@ -1,4 +1,4 @@
-# dsh-plugin-**NAME**
+# **PACKAGE**
 
 **DESCRIPTION**
 
@@ -9,8 +9,8 @@
 
 ```bash
 pnpm install          # 仓库根目录
-pnpm --filter dsh-plugin-__NAME__ typecheck
-pnpm --filter dsh-plugin-__NAME__ build
+pnpm --filter __PACKAGE__ typecheck
+pnpm --filter __PACKAGE__ build
 pnpm test             # 仓库根目录运行全部插件测试
 ```
 
@@ -18,9 +18,11 @@ pnpm test             # 仓库根目录运行全部插件测试
 
 ## 安装
 
-1. `pnpm --filter dsh-plugin-__NAME__ build`
-2. DeepSeek Harness → 插件 → 添加插件 → 选择本目录
-3. 在新会话中调用 `__TOOL__` 验证
+- **npm（发布后）**：DeepSeek Harness → 插件 → 添加插件 → 输入 `__PACKAGE__`
+- **本地开发**：
+  1. `pnpm --filter __PACKAGE__ build`
+  2. 插件 → 添加插件 → 选择本目录
+  3. 在新会话中调用 `__TOOL__` 验证
 
 ## 限制
 

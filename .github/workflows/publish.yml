@@ -1,0 +1,57 @@
+name: Publish
+
+on:
+  push:
+    tags: ['*-v*']
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.26.1
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Resolve the plugin from the tag
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          pattern='^([a-z0-9][a-z0-9-]*)-v([0-9]+\.[0-9]+\.[0-9]+([-.+][0-9A-Za-z.-]+)?)$'
+          if [[ ! "$tag" =~ $pattern ]]; then
+            echo "::error::Tag '$tag' must look like <plugin>-v<semver>, for example hello-v0.1.0"
+            exit 1
+          fi
+          name="${BASH_REMATCH[1]}"
+          version="${BASH_REMATCH[2]}"
+          manifest="plugins/${name}/package.json"
+          if [[ ! -f "$manifest" ]]; then
+            echo "::error::$manifest does not exist"
+            exit 1
+          fi
+          package="$(node -p "require('./$manifest').name")"
+          actual="$(node -p "require('./$manifest').version")"
+          if [[ "$actual" != "$version" ]]; then
+            echo "::error::$package is $actual in package.json but the tag says $version"
+            exit 1
+          fi
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "package=$package" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Publishing $package@$version"
+      - name: Build
+        run: pnpm --filter "${{ steps.meta.outputs.package }}" build
+      - name: Publish
+        working-directory: plugins/${{ steps.meta.outputs.name }}
+        run: npm publish --access public --provenance

@@ -3,6 +3,6 @@
 # the plugin re-applies without a restart.
 - insert:
     - id: __NAME__
-      name: dsh-plugin-__NAME__
+      name: '__PACKAGE__'
       config:
         greeting: Hello

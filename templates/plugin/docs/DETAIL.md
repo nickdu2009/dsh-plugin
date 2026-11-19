@@ -16,8 +16,8 @@
 
 ## 安装
 
-1. 构建：`pnpm --filter dsh-plugin-__NAME__ build`
-2. 在 DeepSeek Harness 中打开「插件」页面，选择「添加插件」，选中本插件目录。
+1. 构建：`pnpm --filter __PACKAGE__ build`
+2. 在 DeepSeek Harness 中打开「插件」页面，选择「添加插件」，选中本插件目录；发布到 npm 后也可以直接输入包名 `__PACKAGE__`。
 3. 在**新会话**中让模型调用 `__TOOL__` 验证。
 
 ## 限制
