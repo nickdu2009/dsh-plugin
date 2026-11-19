@@ -37,9 +37,10 @@ Working agreements for agents that develop plugins in this repository.
 
 ## Publish
 
-- Releases use Trusted Publishing from `.github/workflows/publish.yml`; never add an `NPM_TOKEN` secret or commit npm credentials.
-- Bump `version` in the plugin's `package.json`, commit it, then push a tag named `<plugin>-v<version>` (for example `hello-v0.1.1`). The workflow verifies the tag against the manifest, builds, and publishes with provenance.
-- The first version of a new package must be published manually (npm requires the package to exist before a trusted publisher can be attached), then bind the GitHub repository and `publish.yml` under the package's npm settings.
+- CI publishes from `.github/workflows/publish.yml` with the repository secret `NPM_TOKEN`; never commit it, echo it, or place it in a workflow file.
+- `NPM_TOKEN` is a granular npm access token scoped to `@nick.du` with package read/write and 2FA bypass, stored only as an Actions secret with a short expiry. Renew it before it expires.
+- Bump `version` in the plugin's `package.json`, commit it, then push a tag named `<plugin>-v<version>` (for example `hello-v0.1.1`). The workflow verifies the tag against the manifest, runs `pnpm check`, and publishes. New packages need no manual bootstrap while token publishing is allowed.
+- npm restricts bypass-2FA tokens from direct publishing in January 2027. Before then, attach a per-package Trusted Publisher (`nickdu2009/dsh-plugin`, workflow `publish.yml`), switch the workflow back to OIDC, and delete `NPM_TOKEN`.
 - Do not publish a package whose `engines.dsh` does not cover the DSH version it was verified against.
 
 ## Dependency policy
