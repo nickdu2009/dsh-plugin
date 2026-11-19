@@ -1,6 +1,6 @@
 {
   "name": "@nick.du/dsh-plugin-hello",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Adds a hello_greet tool that greets someone by name.",
   "license": "MIT",
   "type": "module",
