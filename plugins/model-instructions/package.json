@@ -1,6 +1,6 @@
 {
   "name": "@nick.du/dsh-plugin-model-instructions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Adds system-prompt instructions selected by the model that is about to answer, with a Settings page.",
   "license": "MIT",
   "type": "module",
