@@ -34,6 +34,7 @@ Working agreements for agents that develop plugins in this repository.
 - Build before installing from a directory; DSH links the directory, so a rebuild is required after source changes.
 - After installation, verify the requested capability in a **new session** (or the live page for UI). Confirm the plugin row, locale text, detail page, and icon. Report what remains unverified; installation alone is not visual or behavioral verification.
 - Restore any user state changed during testing.
+- For behavioural proof without a human clicking, load the project skill `dsh-plugin-e2e-verify` (`.agents/skills/dsh-plugin-e2e-verify/SKILL.md`): it drives a real DSH Web GUI in a throwaway profile, captures screenshots and wire payloads, and lists the traps that produce false results.
 
 ## Publish
 
