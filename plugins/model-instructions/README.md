@@ -78,9 +78,22 @@ pnpm test             # 仓库根目录运行全部插件测试
 
 ### 发布
 
-发布走 `.github/workflows/publish.yml`：先把 `package.json` 的 `version` 改好并提交，再推送 `<插件目录名>-v<版本>` 标签（例如 `model-instructions-v1.0.0`）。workflow 会校验标签与 manifest 一致、运行 `pnpm check`，然后在本目录执行 `npm publish --access public --provenance`。
+发布使用 **Staged Publishing + Trusted Publishing (OIDC)**，不需要 `NPM_TOKEN`。
 
-本地手动发布前也要先构建：`prepack` 已配置为 `pnpm build`，因此 `npm publish` / `npm pack` 会自动把最新的 `lib/` 打进包里，不会发出缺少运行时代码的空包。
+**首版（每个新包一次）**：在本目录构建并 stage，由维护者在 npm 上完成 2FA 批准，再给包绑定 trusted publisher：
+
+```bash
+pnpm build
+npx -y npm@11 stage publish --access public
+npx -y npm@11 stage list
+npx -y npm@11 stage approve <stage-id>
+npx -y npm@11 trust github @nick.du/dsh-plugin-model-instructions \
+  --repo nickdu2009/dsh-plugin --file publish.yml --allow-publish --yes
+```
+
+**之后的版本**：把 `package.json` 的 `version` 改好并提交，推送 `<插件目录名>-v<版本>` 标签（例如 `model-instructions-v1.0.0`）。`.github/workflows/publish.yml` 会校验标签与 manifest 一致、运行 `pnpm check`，然后用 OIDC 在本目录执行 `npm publish --access public --provenance`。
+
+`prepack` 已配置为 `pnpm build`，因此本地 `npm stage publish` / `npm pack` 会自动把最新的 `lib/` 打进包里，不会发出缺少运行时代码的空包。不要从仓库根目录发布。
 
 ## 限制
 
