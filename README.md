@@ -126,6 +126,12 @@ cd plugins/hello
 npm publish --access public
 ```
 
+> 不要在仓库根目录直接执行 `npm publish`：根目录的 `package.json` 是 private 的 workspace 清单，不是插件包，会报 `EPRIVATE`。也可以从根目录指定包：
+
+```bash
+pnpm --filter @nick.du/dsh-plugin-hello publish --access public
+```
+
 然后在 npmjs.com → 该包 → **Settings → Trusted publishing** 添加 GitHub Actions：
 
 - Repository: `nickdu2009/dsh-plugin`
