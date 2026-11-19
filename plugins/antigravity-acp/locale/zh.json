@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Antigravity (ACP)",
+    "description": "通过官方 Antigravity ACP CLI 路由明确的聊天输入，并在本地转换附加的 PDF。",
+    "detail": "docs/DETAIL.md"
+  }
+}

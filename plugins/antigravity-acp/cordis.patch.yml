@@ -1,0 +1,6 @@
+# Native model adapter; the official agy CLI owns authentication.
+- insert:
+    - id: antigravity-acp
+      name: '@nick.du/dsh-plugin-antigravity-acp'
+      config:
+        executable: agy

@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Antigravity (ACP)",
+    "description": "Routes explicit chat submissions through the official Antigravity ACP CLI and converts attached PDFs locally.",
+    "detail": "docs/DETAIL.md"
+  }
+}
