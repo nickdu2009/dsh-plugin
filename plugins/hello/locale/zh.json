@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Hello 问候",
+    "description": "添加 hello_greet 工具，让 Agent 按名字向对方问好。",
+    "detail": "docs/DETAIL.md"
+  }
+}

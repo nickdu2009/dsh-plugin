@@ -1,0 +1,23 @@
+node_modules/
+lib/
+coverage/
+*.tsbuildinfo
+
+# DSH profile / local state
+.dsh/
+*.local
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/*.log
+
+# Logs and secrets
+*.log
+pnpm-debug.log*
+.env
+.env.*
+!.env.example
+
+# pnpm store created inside the repository when the global store is unavailable
+.pnpm-store/

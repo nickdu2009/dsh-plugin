@@ -1,0 +1,8 @@
+# Plugin row for this bundle. `id` matches the directory, `name` matches the package name.
+# Ordinary configuration (`greeting`) can be changed here or in the profile's own patch layer;
+# the plugin re-applies without a restart.
+- insert:
+    - id: __NAME__
+      name: dsh-plugin-__NAME__
+      config:
+        greeting: Hello

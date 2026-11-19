@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Hello",
+    "description": "Adds a hello_greet tool that greets someone by name.",
+    "detail": "docs/DETAIL.md"
+  }
+}
