@@ -53,6 +53,12 @@
 
 ## 安装
 
+### 从 npm（发布后）
+
+DeepSeek Harness → **插件 / Plugins** → **添加插件 / Add plugin**，输入包名 `@nick.du/dsh-plugin-model-instructions`。DSH 会校验 `engines.dsh` 与当前版本是否兼容，并加载预构建的 `lib/`，不需要用户执行构建。
+
+### 从本地目录（开发）
+
 1. 构建：`pnpm --filter @nick.du/dsh-plugin-model-instructions build`
 2. DeepSeek Harness → **插件 / Plugins** → **添加插件 / Add plugin**，选择 `plugins/model-instructions` 目录（不要选仓库根目录）。
 3. 在**新会话**中打开 **设置 → 按模型注入**，添加一条规则验证。

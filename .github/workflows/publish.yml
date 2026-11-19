@@ -21,6 +21,10 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           cache: pnpm
+      - name: Ensure npm supports trusted publishing
+        run: |
+          npm install -g npm@^11.5.1
+          npm --version
       - run: pnpm install --frozen-lockfile
       - name: Resolve the plugin from the tag
         id: meta
@@ -50,8 +54,8 @@ jobs:
           echo "package=$package" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "Publishing $package@$version"
-      - name: Build
-        run: pnpm --filter "${{ steps.meta.outputs.package }}" build
+      - name: Check and build
+        run: pnpm check
       - name: Publish
         working-directory: plugins/${{ steps.meta.outputs.name }}
         run: npm publish --access public --provenance
