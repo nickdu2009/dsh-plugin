@@ -2,6 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
+    // `src/` stays out of the npm tarball, so embed the sources the maps
+    // reference; DSH serves `<client>.js.map` beside the bundle.
+    "inlineSources": true,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

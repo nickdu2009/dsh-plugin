@@ -37,11 +37,10 @@ Working agreements for agents that develop plugins in this repository.
 
 ## Publish
 
-- CI publishes from `.github/workflows/publish.yml` with the repository secret `NPM_TOKEN`; never commit it, echo it, or place it in a workflow file.
-- `NPM_TOKEN` is a granular npm access token scoped to `@nick.du` with package read/write and 2FA bypass, stored only as an Actions secret with a short expiry. Renew it before it expires.
-- Bump `version` in the plugin's `package.json`, commit it, then push a tag named `<plugin>-v<version>` (for example `hello-v0.1.1`). The workflow verifies the tag against the manifest, runs `pnpm check`, and publishes. New packages need no manual bootstrap while token publishing is allowed.
-- npm restricts bypass-2FA tokens from direct publishing in January 2027. Before then, attach a per-package Trusted Publisher (`nickdu2009/dsh-plugin`, workflow `publish.yml`), switch the workflow back to OIDC, and delete `NPM_TOKEN`.
-- Do not publish a package whose `engines.dsh` does not cover the DSH version it was verified against.
+- Releases use **Staged Publishing + Trusted Publishing (OIDC)**. Never add a bypass-2FA publish token, an `NPM_TOKEN` secret, or npm credentials to the repository.
+- First version of a new package (`<name>-v<version>`): from the plugin directory run `npx -y npm@11 stage publish --access public` (no 2FA at stage time), have the maintainer approve the stage with 2FA (`npm stage approve <stage-id>` or the npm website), then attach the trusted publisher: `npx -y npm@11 trust github <pkg> --repo nickdu2009/dsh-plugin --file publish.yml --allow-publish --yes`.
+- After trust is attached, bump `version` in the plugin's `package.json`, commit it, push a tag named `<plugin>-v<version>` (for example `hello-v0.1.1`), and let `.github/workflows/publish.yml` verify, run `pnpm check`, and publish via OIDC.
+- Do not use bypass-2FA tokens (npm restricts them from direct publishing from January 2027) and do not publish or stage from the workspace root.
 
 ## Dependency policy
 

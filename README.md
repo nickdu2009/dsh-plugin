@@ -114,25 +114,46 @@ DSH 会校验 `engines.dsh` 与当前版本是否兼容，然后安装预构建�
 
 ## 发布到 npm
 
-发布使用 scope `@nick.du`（npm 账号 `nick.du`）。`.github/workflows/publish.yml` 在 tag 推送时用仓库 secret `NPM_TOKEN` 发布；**首版和后续版本走同一流程**，新包也由 CI 直接创建。
+发布使用 scope `@nick.du`（npm 账号 `nick.du`），走 **Staged Publishing + Trusted Publishing (OIDC)**：
 
-### 一次性准备：NPM_TOKEN
+- 每个新包的**首版**：本地 stage → 维护者 2FA 批准 → 给该包绑定 trusted publisher；
+- **之后的版本**：打 tag，`.github/workflows/publish.yml` 用 OIDC 自动发布，不需要 token，也不需要验证码。
 
-1. 打开 npmjs.com → **Access Tokens** → **Generate New Token** → **Granular Access Token**。
-2. 名称填 `dsh-plugin CI`，过期时间建议 90 天。
-3. **Permissions → Packages** 选 **Read and write**。
-4. **Packages and scopes** 选择 `@nick.du`（或 All packages），确保覆盖以后新建的包。
-5. 勾选 **Bypass 2FA**：CI 无法交互输入验证码。
-6. 在仓库根目录把 token 存进 Actions secret：
+### 新包首版（每个包一次）
+
+1. 构建并 stage（stage 阶段不需要验证码）：
 
 ```bash
-gh secret set NPM_TOKEN
-# 粘贴 token；不会回显，也不会进入 shell 历史
+cd plugins/hello
+pnpm build
+npx -y npm@11 stage publish --access public
 ```
 
-也可以到 GitHub → Settings → Secrets and variables → Actions → **New repository secret** 添加 `NPM_TOKEN`。
+2. 查看 stage 并批准（需要 npm 2FA 验证码）：
 
-> 安全与期限：`NPM_TOKEN` 等同于一个能发布 `@nick.du` 下所有包的凭据，只放 Actions secret，不要写进仓库；设置较短过期时间并定期轮换。npm 正在限制绕过 2FA 的 token（2026-07 起限制敏感操作，2027-01 起不能直接发布），到期后按文末“长期方案”切到 Trusted Publishing。
+```bash
+npx -y npm@11 stage list
+npx -y npm@11 stage approve <stage-id>
+```
+
+也可以到 npm 网页的 staged packages 页面批准。
+
+3. 给包绑定 trusted publisher（包已经存在后才能绑定；可能需要一次 2FA）：
+
+```bash
+npx -y npm@11 trust github @nick.du/dsh-plugin-hello \
+  --repo nickdu2009/dsh-plugin --file publish.yml --allow-publish --yes
+```
+
+或在 npmjs.com → 包 → **Settings → Trusted publishing** 添加 GitHub Actions：
+
+- Repository: `nickdu2009/dsh-plugin`
+- Workflow filename: `publish.yml`
+- Environment: 留空
+
+4. 之后这个包的版本都按下面的 tag 流程发布。
+
+> `npm stage publish` 从 2026-10 起可以创建新包，且 stage 时不要求 2FA；批准阶段才验证身份。因此新包不需要 bypass-2FA 的 publish token，也不会在 2027-01 后失效。
 
 ### 发布一个版本
 
@@ -150,26 +171,16 @@ tag 格式为 `<插件目录名>-v<semver>`，例如 `hello-v0.1.1`。workflow �
 
 1. 要求 tag 与 `plugins/hello/package.json` 的版本一致；
 2. 跑 `pnpm check`；
-3. 在插件目录执行 `npm publish --access public --provenance`，用 `NPM_TOKEN` 认证。
+3. 在插件目录执行 `npm publish --access public --provenance`（OIDC）。
 
-新插件首次发布同样只需打 tag（例如 `quick-note-v0.1.0`），CI 会创建包，不需要手工 `npm publish` 或逐包绑定。
+### 可选：让 CI 来 stage 新包
 
-### 长期方案：Trusted Publishing
+如果不想本地跑首版，可以配置一个 **stage-only** granular token 作为 `NPM_TOKEN`，workflow 改成 `npm stage publish`；stage 之后仍需要在 npm 上用 2FA 批准。本项目默认不需要这个 token。
 
-token 方案到期后，给每个包绑定 trusted publisher，然后删除 `NPM_TOKEN`，CI 会改用 OIDC：
+### 注意
 
-- npmjs.com → 包 → **Settings → Trusted publishing** → 添加 GitHub Actions：
-  - Repository: `nickdu2009/dsh-plugin`
-  - Workflow filename: `publish.yml`
-  - Environment: 留空
-- 或用 npm 11.15+：
-
-```bash
-npx -y npm@latest trust github <包名> \
-  --repo nickdu2009/dsh-plugin --file publish.yml --allow-publish --yes
-```
-
-trust 只能加在已经存在的包上，所以顺序是：先用 token 发布首版 → 绑定 trusted publisher → 之后可删除 token。
+- 不要使用 bypass-2FA 的 publish token：npm 2026-07 起限制敏感操作，2027-01 起不能再直接发布。
+- 不要从仓库根目录执行 `npm publish` 或 `npm stage publish`：根 `package.json` 是 private 的 workspace，不是插件包。
 
 ## 校验与 CI
 

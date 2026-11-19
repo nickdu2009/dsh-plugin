@@ -21,6 +21,10 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org
           cache: pnpm
+      - name: Ensure npm supports trusted publishing
+        run: |
+          npm install -g npm@^11.5.1
+          npm --version
       - run: pnpm install --frozen-lockfile
       - name: Resolve the plugin from the tag
         id: meta
@@ -52,16 +56,6 @@ jobs:
           echo "Publishing $package@$version"
       - name: Check and build
         run: pnpm check
-      - name: Require the npm token
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "::error::Add a granular npm access token as the repository secret NPM_TOKEN."
-            exit 1
-          fi
       - name: Publish
         working-directory: plugins/${{ steps.meta.outputs.name }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public --provenance

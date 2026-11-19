@@ -40,11 +40,13 @@
     "locale",
     "docs",
     "icon.svg",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@deepseek-ai/schemastery": "3.19.0"
