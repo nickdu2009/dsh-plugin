@@ -1,5 +1,7 @@
 # dsh-plugin
 
+[![CI](https://github.com/nickdu2009/dsh-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/nickdu2009/dsh-plugin/actions/workflows/ci.yml)
+
 [DeepSeek Harness](https://deepseek.com)（DSH）插件集合。**一个目录一个插件**：`plugins/<name>/` 就是一个独立的 DSH bundle，可以单独安装、启用和卸载。
 
 - 新插件一律使用 **TypeScript** 开发。
