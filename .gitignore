@@ -1,7 +1,19 @@
+# Dependencies (root and per-plugin)
 node_modules/
+
+# pnpm store created inside the repository when the global store is unavailable
+.pnpm-store/
+
+# Build output: each plugin compiles src/ to lib/
 lib/
-coverage/
+dist/
 *.tsbuildinfo
+
+# Test and tooling caches
+coverage/
+.cache/
+.vite/
+.turbo/
 
 # DSH profile / local state
 .dsh/
@@ -9,15 +21,25 @@ coverage/
 
 # Editor and OS
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/*.log
 
-# Logs and secrets
+# Logs
 *.log
+npm-debug.log*
 pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment and credentials
 .env
 .env.*
 !.env.example
+.npmrc
+!.npmrc.example
+*.pem
+*.key
 
-# pnpm store created inside the repository when the global store is unavailable
-.pnpm-store/
+# Package artifacts from pnpm pack / npm publish
+*.tgz
