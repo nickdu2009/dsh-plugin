@@ -1,0 +1,20 @@
+# Model-specific system-prompt instructions.
+#
+# Rules are maintained from Settings ("Model instructions" page) and stored in
+# this row's config by the profile's configuration editor: `rules` is a volatile
+# field, so a save applies to the next model step without remounting the plugin.
+#
+# The section is assembled once per model step, so the model that is about to
+# answer selects the text. Every matching rule appends its `instruction`, in
+# declaration order; nothing matches means an empty section and no tokens.
+#
+# Only `rules` is edited from the page. `order`, `name`, and `interpolate` are
+# ordinary configuration: change them here (or in the profile's patch layer),
+# and the plugin re-applies as usual.
+- insert:
+    - id: model-instructions
+      name: '@nick.du/dsh-plugin-model-instructions'
+      config:
+        order: 9500
+        interpolate: false
+        rules: []

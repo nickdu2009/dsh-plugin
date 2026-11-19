@@ -34,6 +34,16 @@ importers:
         specifier: 4.1.0
         version: 4.1.0
 
+  plugins/model-instructions:
+    dependencies:
+      '@deepseek-ai/schemastery':
+        specifier: 3.19.0
+        version: 3.19.0
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: 4.1.0
+        version: 4.1.0
+
 packages:
 
   '@deepseek-ai/cordis@4.1.0':

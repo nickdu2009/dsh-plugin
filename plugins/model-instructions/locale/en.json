@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Model instructions",
+    "description": "Adds system-prompt instructions chosen by the model that is about to answer. Rules are added from Settings > Model rules with provider and model globs; every matching rule is appended in order, an unmatched model keeps the prompt unchanged, and saves apply to the next model step.",
+    "detail": "docs/DETAIL.md"
+  }
+}

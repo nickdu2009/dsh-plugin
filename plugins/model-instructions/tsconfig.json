@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // The browser half is a classic script that reads `window`; the Host half
+    // still only uses Node APIs (see src/client.ts for the script constraint).
+    "lib": ["ES2023", "DOM"],
+    // src/client.ts must stay a classic script even though the package is
+    // `"type": "module"`: DSH loads it through a classic <script> element, and
+    // `moduleDetection: "auto"` would make tsc emit a trailing `export {}`.
+    "moduleDetection": "legacy"
+  },
+  "include": ["src"]
+}
