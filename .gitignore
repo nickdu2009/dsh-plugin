@@ -17,6 +17,7 @@ coverage/
 
 # DSH profile / local state
 .dsh/
+.agent-teams/
 *.local
 
 # Editor and OS
