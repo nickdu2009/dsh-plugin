@@ -176,14 +176,19 @@ describe('SubmissionRouter', () => {
     const hostLlm = hostRequire('@deepseek-ai/dsh-llm') as {
       markAgentLoopRequest(options: GenerateOptions): GenerateOptions
     }
-    const previousInstallDir = process.env.DSH_INSTALL_DIR
-    process.env.DSH_INSTALL_DIR = hostInstallDir
     try {
-      const router = new SubmissionRouter()
+      const router = new SubmissionRouter(join(hostInstallDir, 'package.json'))
       const message = user('host-marked')
       const marked = request([message], 'host-session', false)
       hostLlm.markAgentLoopRequest(marked)
       expect(isLocalAgentLoopRequest(marked)).toBe(false)
+      for (const anchor of [undefined, 'invalid-anchor']) {
+        const unavailable = new SubmissionRouter(anchor)
+        unavailable.claim('host-session', 1, 1, 'gemini', [message])
+        expect(() => unavailable.authorize(marked)).toThrowError(
+          expect.objectContaining({ code: 'ACP_NOT_AGENT_LOOP' }),
+        )
+      }
       router.claim('host-session', 1, 1, 'gemini', [message])
       router.authorize(marked)
       expect(router.consume(marked).messages).toEqual([message])
@@ -205,8 +210,6 @@ describe('SubmissionRouter', () => {
         expect.objectContaining({ code: 'ACP_NOT_AGENT_LOOP' }),
       )
     } finally {
-      if (previousInstallDir === undefined) delete process.env.DSH_INSTALL_DIR
-      else process.env.DSH_INSTALL_DIR = previousInstallDir
       await rm(temporary, { recursive: true, force: true })
     }
   })

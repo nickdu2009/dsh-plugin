@@ -89,7 +89,9 @@ export function apply(ctx: Context, config: Config): void {
   const llm = ctx.get('llm') as unknown as LlmRegistry
   const attachments = ctx.get('attachments') as unknown as AttachmentService
   const office = ctx.get('officeKit') as unknown as OfficeRenderer
-  const router = new SubmissionRouter()
+  // The host's install anchor is a launcher service, not a shell environment variable.
+  const profile = ctx.get('profileContext') as { installAnchor?: string } | undefined
+  const router = new SubmissionRouter(profile?.installAnchor)
   const gateway = new AcpClient(config.executable, undefined, {
     idleTimeoutMs: config.idleTimeoutSeconds * 1000,
   })

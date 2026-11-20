@@ -1,5 +1,4 @@
 import { createRequire } from 'node:module'
-import { join } from 'node:path'
 import { isAgentLoopRequest as isLocalAgentLoopRequest } from '@deepseek-ai/dsh-llm'
 import type { GenerateOptions, UserMessage } from '@deepseek-ai/dsh-llm'
 
@@ -8,11 +7,10 @@ import type { GenerateOptions, UserMessage } from '@deepseek-ai/dsh-llm'
  * instances. Its marker is a module-local WeakSet, so resolve the Host's copy
  * as well as our own; never replace this origin check with shape/frozen checks.
  */
-function isHostAgentLoopRequest(options: GenerateOptions): boolean {
-  const installDir = process.env.DSH_INSTALL_DIR
-  if (!installDir) return false
+function isHostAgentLoopRequest(options: GenerateOptions, installAnchor?: string): boolean {
+  if (!installAnchor) return false
   try {
-    const hostRequire = createRequire(join(installDir, 'package.json'))
+    const hostRequire = createRequire(installAnchor)
     const hostLlm: unknown = hostRequire('@deepseek-ai/dsh-llm')
     if (
       typeof hostLlm !== 'object' ||
@@ -28,8 +26,8 @@ function isHostAgentLoopRequest(options: GenerateOptions): boolean {
   }
 }
 
-function isAgentLoopRequest(options: GenerateOptions): boolean {
-  return isHostAgentLoopRequest(options) || isLocalAgentLoopRequest(options)
+function isAgentLoopRequest(options: GenerateOptions, installAnchor?: string): boolean {
+  return isHostAgentLoopRequest(options, installAnchor) || isLocalAgentLoopRequest(options)
 }
 
 export const PROVIDER = 'antigravity-acp'
@@ -78,6 +76,8 @@ export class SubmissionRouter {
   private readonly claims = new Map<string, ClaimedSubmission>()
   private readonly authorized = new Map<string, ClaimedSubmission>()
 
+  constructor(private readonly installAnchor?: string) {}
+
   claim(
     sessionId: string,
     turn: number,
@@ -118,7 +118,7 @@ export class SubmissionRouter {
   authorize(options: GenerateOptions): ClaimedSubmission {
     if (options.provider !== PROVIDER)
       throw new RouteError('The ACP router received another provider.', 'ACP_PROVIDER_MISMATCH')
-    if (!isAgentLoopRequest(options))
+    if (!isAgentLoopRequest(options, this.installAnchor))
       throw new RouteError(
         'The ACP request did not originate in the DSH agent loop.',
         'ACP_NOT_AGENT_LOOP',

@@ -1,6 +1,6 @@
 {
   "name": "@nick.du/dsh-plugin-antigravity-acp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Routes explicit chat submissions through the official Antigravity ACP CLI and converts attached PDFs locally.",
   "license": "MIT",
   "type": "module",
